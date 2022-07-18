@@ -1,0 +1,43 @@
+CREATE TABLE products(
+    id SERIAL PRIMARY KEY,
+    product_name VARCHAR(30) NOT NULL,
+    company VARCHAR(20) NOT NULL ,
+    product_count INTEGER DEFAULT 0,
+    price NUMERIC NOT NULL
+);
+CREATE TABLE customer(
+    id SERIAL PRIMARY KEY ,
+    first_name VARCHAR(30) NOT NULL
+);
+CREATE TABLE Orders(
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    customer_id INTEGER NOT NULL REFERENCES customer(id) ON DELETE CASCADE,
+    created DATE NOT NULL,
+    product_count INT DEFAULT 1,
+    price NUMERIC NOT NULL
+);
+INSERT INTO products(product_name, company, product_count, price)
+VALUES ('Iphone X','Apple',2,66000),
+       ('Iphone 8','Apple',2,51000),
+       ('Iphone 7','Apple',5,42000),
+       ('Galaxy S9','Samsung',2,56000),
+       ('Galaxy S8 Plus','Samsung',1,46000),
+       ('Nokia 9','HDM Global',2,26000),
+       ('Desire 12','HTC',6,38000);
+INSERT INTO customer(first_name)
+VALUES ('Bob'),('Tom'),('Sam');
+INSERT INTO orders(product_id, customer_id, created, product_count, price)
+VALUES ((SELECT id FROM products WHERE product_name = 'Galaxy S9'),
+        (SELECT id FROM customer WHERE first_name = 'Tom'),'2017-07-11',2,
+        (SELECT price FROM products WHERE product_name = 'Galaxy S9')),
+
+    ((SELECT id FROM products WHERE product_name = 'Iphone 8'),
+        (SELECT id FROM customer WHERE first_name = 'Tom'),'2017-07-13',1,
+        (SELECT price FROM products WHERE product_name = 'Iphone 8')),
+
+    ((SELECT id FROM products WHERE product_name = 'Iphone 8'),
+        (SELECT id FROM customer WHERE first_name = 'Sam'),'2017-07-11',1,
+        (SELECT price FROM products WHERE product_name = 'Iphone 8'));
+
+SELECT * FROM Orders,customer;
