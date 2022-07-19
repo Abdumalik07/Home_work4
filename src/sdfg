@@ -1,29 +1,38 @@
-/*1*/  SELECT *  FROM customer WHERE country = 'Canada';
 
-/*2*/  SELECT DISTINCT country FROM customer;
 
-/*3*/  SELECT count(total_amount) FROM orders;
-
-/*4*/  SELECT max(unit_price  * total_amount) AS max_price_of_orders FROM order_item JOIN orders o on o.id = order_item.order_id;
-
-/*5*/  SELECT sum(unit_price * total_amount) AS sum_of_all_orders FROM order_item JOIN orders o on order_item.order_id = o.id;
-
-/*6*/  SELECT sum(unit_price * orders.total_amount) FROM orders JOIN product ON unit_price = unit_price
-       WHERE order_date BETWEEN '2014-01-01' AND '2015-01-01';
-
-/*7*/  SELECT avg(total_amount * unit_price) AS average_of_all_orders_amount FROM orders JOIN product ON unit_price = unit_price;
-
-/*8*/ SELECT first_name, avg(total_amount * product.unit_price)FROM customer,order_item
-      JOIN orders ON orders.id = order_item.order_id
-      JOIN product ON product.id = order_item.product_id
-      group by first_name;
-/*9*/ SELECT * FROM customer WHERE country IN ('Spain') OR country IN ('Brazil');
-/*10*/
-/*11*/
-/*12*/
-/*13*/
-/*14*/
-/*15*/
-/*16*/
-/*17*/
-/*18*/
+-- 1) Вывести всех клиентов из страны Canada
+SELECT * FROM customer WHERE country LIKE 'Canada';
+-- 2) Вывести все страны клиентов
+SELECT DISTINCT country FROM customer;
+-- 3) Вывести количество всех заказов
+SELECT COUNT(*) FROM orders;
+-- 4) Вывести максимальную стоимость заказа
+SELECT MAX(total_amount) AS max_total_amount_of_orders FROM orders;
+-- 5) Найти сумму всех заказов
+SELECT SUM(total_amount) AS sum_of_orders_total_amount FROM orders;
+-- 6) Найти сумму всех заказов за 2014 год
+SELECT SUM(total_amount) AS sum_of_orders_total_amount_between_2014_and_2015 FROM orders WHERE order_date BETWEEN 'Jan  1 2014' AND 'Dec 31 2014';
+-- 7) Найти среднюю стоимость всех заказов
+SELECT AVG(unit_price) AS average_of_unit_price FROM order_item;
+-- 8) Найти среднюю стоимость всех заказов по каждому клиенту
+SELECT DISTINCT customer.first_name,AVG(total_amount) FROM customer,orders GROUP BY customer.first_name;
+-- 9) Найти всех клиентов, которые живут в Бразилии или Испании
+SELECT * FROM customer WHERE country LIKE 'Brazil' OR 'Spain';
+-- 10 Найти все заказы между 2013ым и 2014ым годами, которые стоили меньше 100.00$
+SELECT * FROM orders WHERE order_date BETWEEN 'Jan 1 2013' AND 'Dec 31 2014' AND orders.total_amount < 100.00;
+-- 11) Найти всех клиентов, которые в одной из стран: Испания, Италия, Германия, Франция. Отсортируйте по странам
+SELECT DISTINCT country, COUNT(customer) FROM customer WHERE customer.country IN ('Spain','Italy','Germany','France') GROUP BY country ORDER BY country;
+-- 12) Найти все страны клиентов, страны которых содержаться в таблице поставщиков
+SELECT DISTINCT customer.country FROM customer INNER JOIN supplier ON customer.country = supplier.country;
+-- 13) Найти всех клиентов, имена которых начинаются на ‘Jo’
+SELECT * FROM customer WHERE customer.first_name LIKE 'Jo%';
+-- 14) Найти всех клиентов, имена которых заканчиваются на ‘a’ и имеют длину ровно 4 символа
+SELECT * FROM customer WHERE customer.first_name LIKE '%a' AND LENGTH(customer.first_name) = 4;
+-- 15) Найти количество клиентов по странам
+SELECT customer.country, COUNT(customer) FROM customer GROUP BY customer.country ORDER BY COUNT(customer);
+-- 16) Найти количество клиентов по странам. Вывести в порядке убывания
+SELECT customer.country, COUNT(customer) FROM customer GROUP BY customer.country ORDER BY COUNT(customer) DESC;
+-- 17) Найти общую сумму стоимости заказов и количество заказов по каждому клиенту (customer_id). Отсортировать по сумме
+SELECT SUM(total_amount), COUNT(*), orders.customer_id FROM orders JOIN customer c ON c.id = orders.customer_id GROUP BY customer_id ORDER BY SUM(total_amount);
+--18) Найти общую сумму стоимости заказов и количество заказов по каждому клиенту (customer_id), у которых общее кол ичество заказов больше 20ти
+SELECT SUM(total_amount), COUNT(*), customer_id, quantity FROM orders JOIN order_item oi ON orders.id = oi.order_id WHERE quantity > 20 GROUP BY quantity, customer_id;
